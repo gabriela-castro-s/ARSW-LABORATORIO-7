@@ -1,0 +1,55 @@
+table, th, td {
+  border: 1px solid black;
+}
+
+table{
+width: 80%;
+}
+
+th,td{
+width: 25%;
+text-align: center;
+}
+
+.tabla, .autor{
+position:relative;
+left: 4%;
+}
+
+.grid{
+display:grid;
+grid-template-columns:50% 50%;
+}
+
+button{
+background-color: white;
+color: #D9EGF3;
+border: 2px solid #D9EGF3;
+border-radius: 20px
+}
+
+button:hover{
+background-color: #D9EGF3;
+color: black;
+border-radius: 20px
+}
+
+body{
+font-family: 'Gloria Hallelujah', cursive;
+background-color: #F1E0EA;
+}
+
+.autor{
+width:30%;
+display:flex;
+justify-content:space-evenly
+}
+
+.titulo{
+position:relative;
+left: 4%;
+}
+
+span{
+font-weight:bold;
+}

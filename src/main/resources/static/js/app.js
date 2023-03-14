@@ -1,4 +1,4 @@
-
+var apimock = apimock;
 
 Blueprint = (function(){
 
@@ -40,6 +40,14 @@ Blueprint = (function(){
     function dibujarPlano(){
 
     }
+
+    function getBlueprintByAuthorAndName(data) {
+                     author = $("#author").val();
+                     blueprintName = data.id;
+                     $("#nameblu").text("Current blueprint: " + blueprintName);
+                     apimock.getBlueprintByAuthorAndName(author, blueprintName, printPoints);
+                 }
+
 
     /**
      * Cambia el autor de un plano.
@@ -89,7 +97,7 @@ Blueprint = (function(){
         ctx.stroke();
 
     }
-    
+
 
 
     return{
