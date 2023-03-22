@@ -70,32 +70,35 @@ public class InMemoryBlueprintPersistence implements BlueprintsPersistence{
     }
 
     @Override
+    public void updateBlueprint(String author,String bprintname, Blueprint bp) throws BlueprintNotFoundException {
+        Blueprint blueprint = getBlueprint(author,bprintname);
+        blueprint.setPoints(bp.getPoints());
+    }
+
+    @Override
     public Blueprint getBlueprint(String author, String bprintname) throws BlueprintNotFoundException {
         return blueprints.get(new Tuple<>(author, bprintname));
     }
 
-    public Set<Blueprint> getBlueprintByAuthor(String author) throws BlueprintNotFoundException {
-        Set<Blueprint> ans = new HashSet<>();
-
-        Blueprint bprintprov;
-        for(Map.Entry<Tuple<String,String>,Blueprint>  entry :  blueprints.entrySet()){
-            bprintprov=entry.getValue();
-            if(bprintprov.getAuthor().equals(author)){
-                ans.add(bprintprov);
+    @Override
+    public Set<Blueprint> getBlueprintsByAuthor(String author) throws BlueprintNotFoundException {
+        Set<Blueprint> authorBlueprints = new HashSet<>();
+        for (Tuple<String,String> key: blueprints.keySet()){
+            if(key.o1.equals(author)){
+                authorBlueprints.add(getBlueprint(author, key.o2));
             }
         }
-        if (ans.isEmpty()){
-            throw new BlueprintNotFoundException("The author does not exist: "+author);
-        }
-        else{
-            return ans;
-        }
-
+        return authorBlueprints;
     }
 
     @Override
-    public void updateBlueprint(String author, String name, Blueprint bp) {
+    public Set<Blueprint> getAllBlueprints() throws BlueprintPersistenceException {
+        return new HashSet<Blueprint>(blueprints.values());
+    }
 
+    @Override
+    public void deleteBlueprint(String author, String bpname) {
+        blueprints.remove(new Tuple<>(author, bpname));
     }
 
 }

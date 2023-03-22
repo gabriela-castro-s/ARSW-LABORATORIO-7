@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.eci.arsw.blueprints.controllers;
 
 import java.util.LinkedHashSet;
@@ -19,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import javax.print.attribute.standard.PageRanges;
@@ -28,55 +22,54 @@ import javax.print.attribute.standard.PageRanges;
  *
  * @author hcadavid
  */
-@Service
 @RestController
 @RequestMapping(value = "/blueprints")
 public class BlueprintAPIController {
 
     @Autowired
-    BlueprintsServices bp= null;
+    BlueprintsServices blueprintsServices;
 
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<?> getBluePrints() {
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getBluePrint() {
         try {
-            Set<Blueprint> blueprints = bp.getAllBlueprints();
+            Set<Blueprint> blueprints = blueprintsServices.getAllBlueprints();
             Gson gson = new Gson();
             return new ResponseEntity<>(gson.toJson(blueprints), HttpStatus.ACCEPTED);
-        } catch (BlueprintNotFoundException ex) {
+        } catch (BlueprintPersistenceException ex) {
             Logger.getLogger(BlueprintAPIController.class.getName()).log(Level.SEVERE, null, ex);
             return new ResponseEntity<>("Error en el metodo getAllBluePrints", HttpStatus.NOT_FOUND);
         }
     }
 
-    @GetMapping("/{author}")
-    public ResponseEntity<?> getAuthor(@PathVariable String author) {
+
+    @RequestMapping(path = "/{author}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getBlueprintByAuthor(@PathVariable String author) {
         try {
-            Set<Blueprint> blueprints = bp.getBlueprintsByAuthor(author);
+            Set<Blueprint> blueprints = blueprintsServices.getBlueprintsByAuthor(author);
             Gson gson = new Gson();
             return new ResponseEntity<>(gson.toJson(blueprints), HttpStatus.ACCEPTED);
         } catch (BlueprintNotFoundException ex) {
             Logger.getLogger(BlueprintAPIController.class.getName()).log(Level.SEVERE, null, ex);
-            return new ResponseEntity<>("Error 404, No se encontro el Author", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Error, No se encontro el Author", HttpStatus.NOT_FOUND);
         }
     }
 
-    @GetMapping("/{author}/{bpname}")
-    public ResponseEntity<?> getBlueprintAuthor(@PathVariable String author, @PathVariable String bpname) {
+    @RequestMapping(path = "/{author}/{bpname}" , method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getBlueprintByAuthorName(@PathVariable String author, @PathVariable String bpname) {
         try {
-            Blueprint blueprint = bp.getBlueprint(author, bpname);
+            Blueprint blueprint = blueprintsServices.getBlueprint(author, bpname);
             Gson gson = new Gson();
             return new ResponseEntity<>(gson.toJson(blueprint), HttpStatus.ACCEPTED);
         } catch (BlueprintNotFoundException ex) {
             Logger.getLogger(BlueprintAPIController.class.getName()).log(Level.SEVERE, null, ex);
-            return new ResponseEntity<>("Error 404, No se encontro el Author o el Blueprint", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Error, No se encontro el Author o el Blueprint", HttpStatus.NOT_FOUND);
         }
     }
 
-    @RequestMapping(path = "/create",method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public ResponseEntity<?> addBlueprint(@RequestBody Blueprint blueprint) {
+    @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> postBlueprint(@RequestBody Blueprint blueprint) {
         try {
-            bp.addNewBlueprint(blueprint);
+            blueprintsServices.addNewBlueprint(blueprint);
             return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (BlueprintPersistenceException ex) {
             Logger.getLogger(BlueprintAPIController.class.getName()).log(Level.SEVERE, null, ex);
@@ -84,19 +77,22 @@ public class BlueprintAPIController {
         }
     }
 
-    @RequestMapping(path = "/update/{author}/{bpname}",method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public ResponseEntity<?> updateBlueprint(@PathVariable String author, @PathVariable String bpname, @RequestBody Blueprint blueprint) {
+    @RequestMapping(path = "/{author}/{bpname}",method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> putBlueprint(@PathVariable String author, @PathVariable String bpname, @RequestBody Blueprint blueprint) {
         try {
-            bp.updateBlueprint(author, bpname, blueprint);
+            blueprintsServices.updateBlueprint(author, bpname, blueprint);
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
-        } catch (BlueprintPersistenceException ex) {
+        } catch (BlueprintNotFoundException | BlueprintPersistenceException ex) {
             Logger.getLogger(BlueprintAPIController.class.getName()).log(Level.SEVERE, null, ex);
             return new ResponseEntity<>( "No se pudo actualizar el Blueprint", HttpStatus.NOT_FOUND);
         }
     }
 
+    @RequestMapping(path = "/{author}/{bpname}", method = RequestMethod.DELETE,produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> deleteBlueprint(@PathVariable String author, @PathVariable String bpname) throws BlueprintNotFoundException {
+        blueprintsServices.deleteBlueprint(author, bpname);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
 
 
 }
-

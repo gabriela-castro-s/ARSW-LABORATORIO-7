@@ -1,7 +1,3 @@
-
-
-
-
 apimock=(function(){
 
 	var mockdata=[];
